@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Create Article</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #f3f4f6;
+    }
+
+    header {
+      background-color: #4f46e5;
+      color: white;
+      padding: 1rem;
+      text-align: center;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 2rem auto;
+      padding: 2rem;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    h2 {
+      color: #374151;
+    }
+
+    label {
+      font-weight: 600;
+      display: block;
+      margin-top: 1rem;
+      margin-bottom: 0.3rem;
+    }
+
+    input[type="text"], textarea, select {
+      width: 100%;
+      padding: 0.8rem;
+      margin-bottom: 1rem;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      background: #f9fafb;
+      font-size: 1rem;
+    }
+
+    textarea {
+      min-height: 150px;
+    }
+
+    .btn {
+      padding: 0.8rem 1.5rem;
+      background-color: #4f46e5;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: background-color 0.3s ease;
+    }
+
+    .btn:hover {
+      background-color: #4338ca;
+    }
+
+    .preview-image {
+      max-width: 200px;
+      margin-top: 1rem;
+      border-radius: 6px;
+      display: block;
+    }
+
+    @media (max-width: 600px) {
+      .container {
+        margin: 1rem;
+        padding: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>📄 Create New Article</h1>
+</header>
+
+<div class="container">
+  <h2>Article Details</h2>
+  <form id="articleForm">
+    <label for="title">Title</label>
+    <input type="text" id="title" name="title" placeholder="Enter article title" required />
+
+    <label for="template">Select Template</label>
+    <select id="template" name="templateId">
+      <option value="">-- Choose a template --</option>
+      <option value="1">Template 1</option>
+      <option value="2">Template 2</option>
+    </select>
+
+    <label for="thumbnail">Thumbnail URL</label>
+    <input type="text" id="thumbnail" name="thumbnail" placeholder="Paste image URL" />
+    <img id="thumbPreview" class="preview-image" src="" alt="" style="display: none;" />
+
+    <label for="content">Content</label>
+    <textarea id="content" name="content" placeholder="Write your article here..." required></textarea>
+
+    <button type="submit" class="btn">Publish Article</button>
+  </form>
+</div>
+
+<script>
+  // Preview thumbnail image
+  document.getElementById("thumbnail").addEventListener("input", function () {
+    const url = this.value;
+    const preview = document.getElementById("thumbPreview");
+    if (url) {
+      preview.src = url;
+      preview.style.display = "block";
+    } else {
+      preview.style.display = "none";
+    }
+  });
+
+  // Submit form
+  document.getElementById("articleForm").addEventListener("submit", async function (e) {
+    e.preventDefault();
+    
+    const formData = {
+      title: document.getElementById("title").value,
+      content: document.getElementById("content").value,
+      thumbnail: document.getElementById("thumbnail").value,
+      templateId: document.getElementById("template").value
+    };
+
+    try {
+      const response = await fetch("http://localhost:8080/api/articles", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(formData)
+      });
+
+      if (response.ok) {
+        alert("✅ Article published successfully!");
+        document.getElementById("articleForm").reset();
+        document.getElementById("thumbPreview").style.display = "none";
+      } else {
+        alert("❌ Failed to publish article.");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      alert("❌ Server error. Try again later.");
+    }
+  });
+</script>
+
+</body>
+</html>
